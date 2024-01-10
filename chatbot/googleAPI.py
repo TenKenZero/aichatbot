@@ -26,7 +26,7 @@ import google.generativeai as genai
 # ]
 
 def ask_Google(message, image, history):
-    genai.configure(api_key='AIzaSyAnHBcdEczO7mFg9xKeuoK3bZg-XAR9W9Q')
+    genai.configure(api_key='...')
     model = genai.GenerativeModel('gemini-pro')
 
     chat = model.start_chat(history=history)

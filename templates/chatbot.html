@@ -161,17 +161,12 @@
     `;
     messagesList.appendChild(messageItem);
 
-    messageInput.value = '';
-    imageInput.value = '';
-
     const formData = new FormData();
     formData.append('csrfmiddlewaretoken', document.querySelector('input[name="csrfmiddlewaretoken"]').value);
     formData.append('message', messageText);
     if (imageInput.files.length > 0) {
       formData.append('image', imageInput.files[0]);
     }
-
-    console.log(formData);
 
     fetch('', {
       method: 'POST',
@@ -197,6 +192,9 @@
         `;
         messagesList.appendChild(messageItem);
       });
+
+    messageInput.value = '';
+    imageInput.value = '';
   });
 </script>
 

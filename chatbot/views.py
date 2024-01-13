@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .openAIAPI import ask_openai
-from .googleAPI import ask_Google
+from .googleAPI import ask_Google, ask_GoogleImage
 
 from django.contrib import auth
 from django.contrib.auth.models import User
@@ -16,34 +16,37 @@ def chatbot(request):
     chatHistory = chats[:3]
 
     if request.method == 'POST':
-        history = []
-        for chat in chatHistory:
-            usermessage = {
-                "parts": {
-                    'text': chat.message
-                },
-                "role": "user"
-            }
-            modelmessage = {
-                "parts": {
-                    'text': chat.response
-                },
-                "role": "model"
-            }
-            history.append(usermessage)
-            history.append(modelmessage)
+        messages = []
 
-        message = request.POST.get('message')
-        image2 = request.POST.get('image')
+        # Message History
+        for chat in chatHistory:
+            user_message = {
+                'role': 'user',
+                'parts': chat.message
+            }
+            model_message = {
+                'role': 'model',
+                'parts': chat.response
+            }
+            messages.append(user_message)
+            messages.append(model_message)
+
+        # Current message
+        user_message = {
+            'role': 'user',
+            'parts': request.POST.get('message')
+        }
+        messages.append(user_message)
+
         image = request.FILES.get('image')
-        print(request.FILES)
-        print(image)
-        print(message)
-        print(image2)
+
         #response = ask_openai(message)
-        response = "holi"#ask_Google(message, image, history)
+        if image:
+            response = ask_GoogleImage(request.POST.get('message'), image)
+        else:
+            response = ask_Google(messages)
         
-        chat = Chat(user=request.user, message=message, response=response, created_at=timezone.now())
+        chat = Chat(user=request.user, message=request.POST.get('message'), response=response, created_at=timezone.now())
         chat.save()
 
         return JsonResponse({'response': response})
